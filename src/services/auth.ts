@@ -1,9 +1,17 @@
-export function signIn() {
+interface Response {
+  token: string;
+  user: {
+    name: string;
+    email: string;
+  };
+}
+
+export function signIn(): Promise<Response> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
         token: 'iopauasAPAPAPAPAOSISAP',
-        users: {
+        user: {
           name: 'Dong',
           email: 'dong@email',
         },
