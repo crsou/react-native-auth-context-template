@@ -1,10 +1,18 @@
 import React, {createContext, useState, useEffect, useContext} from 'react';
 import {View, ActivityIndicator} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import * as auth from '../services/auth';
 import api from '../services/api';
+/**
+ * auth has a fake login function for testing purposes
+ * remove it and change signIn() to receive proper login parameters
+ */
+import * as auth from '../services/auth';
 
 interface User {
+  /**
+   * add to this interface whatever user data you'll need on your app
+   * just make sure your login function returns this data
+   */
   name: string;
   email: string;
 }
@@ -27,8 +35,6 @@ export const AuthProvider: React.FC = ({children}) => {
       const storedUser = await AsyncStorage.getItem('@RNAuth:user');
       const storedToken = await AsyncStorage.getItem('@RNAuth:token');
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
       if (storedToken && storedUser) {
         api.defaults.headers['Authorization'] = `Bearer ${storedToken}`;
         setUser(JSON.parse(storedUser));
@@ -41,10 +47,15 @@ export const AuthProvider: React.FC = ({children}) => {
   }, []);
 
   async function signIn() {
+    /**
+     * this auth.signIn function is a fake login function for testing purposes
+     * you'll need to replace it and its response with an actual backend call.
+     */
     const response = await auth.signIn();
     setUser(response.user);
 
     api.defaults.headers['Authorization'] = `Bearer ${response.token}`;
+
     await AsyncStorage.setItem('@RNAuth:user', JSON.stringify(response.user));
     await AsyncStorage.setItem('@RNAuth:token', response.token);
   }
@@ -58,6 +69,10 @@ export const AuthProvider: React.FC = ({children}) => {
   return (
     <>
       {loading && <ActivityIndicator size="large" color="#666" />}
+      {/**
+       * !!user will return false if there's no user, or true if there is one
+       * it basically creates a boolean from any value, from my understanding.
+       */}
       <AuthContext.Provider value={{signed: !!user, user, signIn, signOut}}>
         {children}
       </AuthContext.Provider>
@@ -68,9 +83,9 @@ export const AuthProvider: React.FC = ({children}) => {
 // export default AuthContext;
 
 /**
- * code below is unnecessary, you can un-comment the above line instead.
- * this saves you the trouble of importing useContext wherever you need this context
- * the function below does that for you.
+ * the code below is not necessary, you can un-comment the above line instead.
+ * but it does save you the trouble of importing useContext wherever you need this context
+ * this function will do that for you.
  */
 export function useAuth() {
   const context = useContext(AuthContext);
