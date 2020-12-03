@@ -1,6 +1,7 @@
 import React, {createContext, useState, useEffect, useContext} from 'react';
-import {View, ActivityIndicator} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import SplashScreen from 'react-native-splash-screen';
+
 import api from '../services/api';
 /**
  * auth has a fake login function for testing purposes
@@ -22,6 +23,7 @@ interface AuthContextData {
   user: User | null;
   signIn(): Promise<void>;
   signOut(): void;
+  initialLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -31,6 +33,7 @@ export const AuthProvider: React.FC = ({children}) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // SplashScreen.show();
     async function loadStoredData() {
       const storedUser = await AsyncStorage.getItem('@RNAuth:user');
       const storedToken = await AsyncStorage.getItem('@RNAuth:token');
@@ -41,6 +44,7 @@ export const AuthProvider: React.FC = ({children}) => {
       }
 
       setLoading(false);
+      // SplashScreen.hide();
     }
 
     loadStoredData();
@@ -68,19 +72,25 @@ export const AuthProvider: React.FC = ({children}) => {
 
   return (
     <>
-      {loading && <ActivityIndicator size="large" color="#666" />}
       {/**
        * !!user will return true if there's content in user, or false if there is none
        * as I understand, it basically creates a boolean from any value.
        */}
-      <AuthContext.Provider value={{signed: !!user, user, signIn, signOut}}>
+      <AuthContext.Provider
+        value={{
+          signed: !!user,
+          user,
+          signIn,
+          signOut,
+          initialLoading: loading,
+        }}>
         {children}
       </AuthContext.Provider>
     </>
   );
 };
 
-// 
+//
 
 /**
  * the function below is not entirely necessary
