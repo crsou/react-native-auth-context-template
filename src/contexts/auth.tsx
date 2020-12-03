@@ -48,7 +48,7 @@ export const AuthProvider: React.FC = ({children}) => {
 
   async function signIn() {
     /**
-     * this auth.signIn function is a fake login function for testing purposes
+     * auth.signIn is a fake login function for testing purposes
      * you'll need to replace it and its response with an actual backend call.
      */
     const response = await auth.signIn();
@@ -70,8 +70,8 @@ export const AuthProvider: React.FC = ({children}) => {
     <>
       {loading && <ActivityIndicator size="large" color="#666" />}
       {/**
-       * !!user will return false if there's no user, or true if there is one
-       * it basically creates a boolean from any value, from my understanding.
+       * !!user will return true if there's content in user, or false if there is none
+       * as I understand, it basically creates a boolean from any value.
        */}
       <AuthContext.Provider value={{signed: !!user, user, signIn, signOut}}>
         {children}
@@ -80,12 +80,14 @@ export const AuthProvider: React.FC = ({children}) => {
   );
 };
 
-// export default AuthContext;
+// 
 
 /**
- * the code below is not necessary, you can un-comment the above line instead.
- * but it does save you the trouble of importing useContext wherever you need this context
- * this function will do that for you.
+ * the function below is not entirely necessary
+ * what it does is save you the trouble of importing useContext wherever you need this context.
+ * you could instead just add "export default AuthContext" at the end of this file
+ * then add "import {useContext} from 'react'" and "import AuthContext from '../contexts/auth'" in other files
+ * and lastly grab values like so "const {signed} = useContext(AuthContext)"
  */
 export function useAuth() {
   const context = useContext(AuthContext);
